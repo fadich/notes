@@ -1,0 +1,38 @@
+{
+    "notes": {
+        "mappings": {
+            "note": {
+                "properties": {
+                    "content": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "analyzer": "my_analyzer",
+                        "fielddata": true
+                    },
+                    "createdAt": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "analyzer": "my_analyzer",
+                        "fielddata": true
+                    },
+                    "updatedAt": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}
