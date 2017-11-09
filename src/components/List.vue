@@ -52,6 +52,7 @@
 
 import es from 'elasticsearch'
 import Vue from 'vue'
+import textHelper from '../helpers/textarea'
 
 Vue.component('textfield', {
   template: `
@@ -219,6 +220,10 @@ let list = {
     })
 
     this.searchNotes()
+
+    setTimeout(function () {
+      textHelper.autoresize()
+    }, 500)
   }
 }
 
