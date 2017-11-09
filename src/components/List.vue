@@ -134,6 +134,10 @@ let list = {
       list.client.search(params)
         .then(function (body) {
           list.notes = body.hits.hits
+
+          setTimeout(function () {
+            textHelper.autoresize()
+          }, 500)
         }, function (error) {
           console.trace(error.message)
         })
@@ -220,10 +224,6 @@ let list = {
     })
 
     this.searchNotes()
-
-    setTimeout(function () {
-      textHelper.autoresize()
-    }, 500)
   }
 }
 
