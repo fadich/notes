@@ -162,7 +162,7 @@ let list = {
     },
     addNote (e) {
       if (e) {
-          e.preventDefault()
+        e.preventDefault()
       }
 
       if (!this.title || !this.content) {
