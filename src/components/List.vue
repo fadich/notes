@@ -2,7 +2,11 @@
     <div class="wrap">
 
         <div class="form-group">
-            <input class="form-control" type="text" v-model="query" placeholder="Search query" @keyup="searchNotes">
+            <input class="form-control"
+                   type="search"
+                   placeholder="Search query"
+                   v-model="query"
+                   @keyup="searchNotes(true)">
         </div>
 
         <form @submit="addNote" @keydown="addNoteInput">
@@ -45,6 +49,10 @@
                 </div>
             </div>
         </div>
+
+        <a @click="loadMore()" class="load-more" v-if="page < pages">Load more</a>
+
+        <hr>
     </div>
 </template>
 
@@ -93,6 +101,7 @@ let list = {
       content: '',
       query: '',
       page: 1,
+      pages: 1,
       notes: [],
       client: null,
       index: 'notes',
@@ -100,9 +109,13 @@ let list = {
     }
   },
   methods: {
-    searchNotes () {
+    searchNotes (reset) {
       let list = this
       let params = {}
+
+      if (reset) {
+        this.page = 1
+      }
 
       params.index = list.index
       params.size = 10
@@ -133,7 +146,15 @@ let list = {
 
       list.client.search(params)
         .then(function (body) {
-          list.notes = body.hits.hits
+          if (list.page > 1) {
+            for (let key in body.hits.hits) {
+              let hit = body.hits.hits[key]
+              list.notes.push(hit)
+            }
+          } else {
+            list.pages = Math.ceil(body.hits.total / 10)
+            list.notes = body.hits.hits
+          }
 
           setTimeout(function () {
             textHelper.autoresize()
@@ -176,7 +197,9 @@ let list = {
       this.notes.unshift({
         _source: body
       })
-      console.warn(this.notes)
+
+      list.page = 1
+
       // Crutch. Waiting for insert...
       // Think that ES does not updating immediately
       setTimeout(function () {
@@ -215,6 +238,10 @@ let list = {
           return false
         }
       })
+    },
+    loadMore () {
+      this.page++
+      this.searchNotes()
     }
   },
   mounted () {
@@ -338,6 +365,10 @@ export default list
                     outline: none;
                 }
             }
+        }
+
+        .load-more {
+            cursor: pointer;
         }
     }
 </style>
