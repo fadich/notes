@@ -36,7 +36,7 @@ curl -XPUT localhost:9242/notes/_settings?pretty -d '{
 curl -XPOST localhost:9242/notes/_open?pretty
 
 elasticdump \
-  --input=./es-backup/notes-index-20171106162732-mapping.json \
+  --input=./es-backup/notes-mapping.json \
   --output=http://localhost:9242/2naps \
   --type=mapping
 

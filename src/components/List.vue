@@ -32,14 +32,11 @@
                     <form @change="updateNote(note)">
                         <div class="title">
                             <div class="field-wrap form-group">
-                                <!--<input v-model="note._source.title">-->
-
                                 <textarea v-model="note._source.title" style="min-height: 150px"></textarea>
                             </div>
                         </div>
                         <div class="comment">
                             <div class="field-wrap">
-                                <!--<textfield :value="note._source.content"></textfield>-->
                                 <div class="textfield form-group">
                                     <textarea v-model="note._source.content"></textarea>
                                 </div>
