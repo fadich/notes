@@ -161,7 +161,9 @@ let list = {
         })
     },
     addNote (e) {
-      e.preventDefault()
+      if (e) {
+          e.preventDefault()
+      }
 
       if (!this.title || !this.content) {
         return
@@ -243,7 +245,7 @@ let list = {
   },
   mounted () {
     this.client = new es.Client({
-      host: 'localhost:9242',
+      host: 'localhost:9200',
       log: 'trace'
     })
 
