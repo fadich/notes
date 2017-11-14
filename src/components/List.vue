@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        <a @click="loadMore()" class="load-more" v-if="page < pages">Load more</a>
+        <a @click="loadMore()" @mouseover="loadMore()" class="load-more" v-if="page < pages">Load more</a>
 
         <hr>
     </div>
@@ -122,7 +122,7 @@ let list = {
       params.from = (list.page - 1) * params.size
 
       params.body = {}
-      if (list.query) {
+      if (list.query.length > 2) {
         params.body.query = {
           bool: {
             must: {
@@ -332,6 +332,7 @@ export default list
                             border: 0;
                             overflow: hidden;
                             resize: none;
+                            line-height: 21px;
 
                             &:focus {
                                 outline: none;
@@ -377,6 +378,8 @@ export default list
 
         .load-more {
             cursor: pointer;
+            height: 100px;
+            padding: 40px;
         }
     }
 </style>
