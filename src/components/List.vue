@@ -163,7 +163,9 @@ let list = {
           console.trace(error.message)
         })
     },
-    addNote () {
+    addNote (e) {
+      e.preventDefault()
+
       if (!this.title || !this.content) {
         return
       }
@@ -325,6 +327,16 @@ export default list
                         .comment {
                             width: 85%;
                         }
+
+                        textarea {
+                            border: 0;
+                            overflow: hidden;
+                            resize: none;
+
+                            &:focus {
+                                outline: none;
+                            }
+                        }
                     }
                 }
             }
@@ -351,10 +363,6 @@ export default list
                     max-width: 100%;
                     padding: 0;
                     margin: 0;
-
-                    &:focus {
-                        outline: none;
-                    }
                 }
             }
 
