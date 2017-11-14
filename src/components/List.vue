@@ -212,8 +212,6 @@ let list = {
       }
     },
     updateNote (note) {
-      console.log(note)
-
       let body = {
         doc: {
           title: note._source.title,
