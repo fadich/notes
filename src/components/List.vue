@@ -132,7 +132,7 @@ let list = {
                       title: {
                         query: list.query,
 //                        fuzziness: 1,
-                        operator: 'OR'
+                        operator: 'AND'
                       }
                     }
                   },
@@ -141,7 +141,7 @@ let list = {
                       content: {
                         query: list.query,
 //                        fuzziness: 1,
-                        operator: 'OR'
+                        operator: 'AND'
                       }
                     }
                   }
