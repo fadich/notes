@@ -98,6 +98,7 @@ let list = {
       content: '',
       query: '',
       page: 1,
+      loading: false,
       pages: 1,
       notes: [],
       client: null,
@@ -155,9 +156,11 @@ let list = {
 
           setTimeout(function () {
             textHelper.autoresize()
+            list.loading = false
           }, 500)
         }, function (error) {
           console.trace(error.message)
+          list.loading = false
         })
     },
     addNote (e) {
@@ -239,13 +242,14 @@ let list = {
       })
     },
     loadMore () {
+      this.loading = true
       this.page++
       this.searchNotes()
     }
   },
   mounted () {
     this.client = new es.Client({
-      host: 'localhost:9200',
+      host: 'localhost:9242',
       log: 'trace'
     })
 
