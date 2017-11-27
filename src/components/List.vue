@@ -120,18 +120,32 @@ let list = {
       params.from = (list.page - 1) * params.size
 
       params.body = {}
+
       if (list.query.length > 2) {
         params.body.query = {
           bool: {
             must: {
               bool: {
-                should: {
-                  multi_match: {
-                    query: list.query,
-                    fuzziness: 'AUTO',
-                    fields: ['title', 'content']
+                should: [
+                  {
+                    match: {
+                      title: {
+                        query: list.query,
+//                        fuzziness: 1,
+                        operator: 'OR'
+                      }
+                    }
+                  },
+                  {
+                    match: {
+                      content: {
+                        query: list.query,
+//                        fuzziness: 1,
+                        operator: 'OR'
+                      }
+                    }
                   }
-                }
+                ]
               }
             }
           }

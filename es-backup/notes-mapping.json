@@ -15,7 +15,7 @@
                         "fielddata": true
                     },
                     "createdAt": {
-                        "type": "integer"
+                        "type": "long"
                     },
                     "title": {
                         "type": "text",
@@ -29,7 +29,7 @@
                         "fielddata": true
                     },
                     "updatedAt": {
-                        "type": "integer"
+                        "type": "long"
                     }
                 }
             }
