@@ -4,7 +4,7 @@
         <div class="form-group">
             <input class="form-control"
                    type="search"
-                   placeholder="Search query"
+                   placeholder="Search query..."
                    v-model="query"
                    @keyup="searchNotes(true)">
         </div>
@@ -16,7 +16,7 @@
             <div class="comment">
                 <div class="field-wrap">
                     <div class="textfield form-group">
-                        <textarea class="form-control" placeholder="Note data" v-model="content"></textarea>
+                        <textarea class="form-control input-padding" placeholder="Note data" v-model="content"></textarea>
                     </div>
                 </div>
             </div>
@@ -286,6 +286,8 @@ export default list
             display: flex;
             flex-direction: column;
             border: 1px solid #d2d4d9;
+            border-radius: 5px 5px 0 0;
+            margin: 0;
 
             .head {
                 width: 100%;
@@ -382,11 +384,12 @@ export default list
                 }
             }
 
-            input {
+            input, textarea {
                 width: 100%;
 
                 &:focus {
                     outline: none;
+                    box-shadow: none;
                 }
             }
         }
@@ -395,6 +398,33 @@ export default list
             cursor: pointer;
             height: 100px;
             padding: 40px;
+        }
+
+        .input-padding {
+            padding: .375rem .75rem !important;
+        }
+
+        input[type="search"] {
+            border: none;
+            border-bottom: 1px solid #CCC;
+            border-radius: 0;
+
+            &:focus {
+                outline: none;
+                box-shadow: none;
+                transition: 0.5s;
+                border-bottom: 1px solid #55F;
+
+                &::placeholder {
+                    color: #DDD;
+                    transition: 0.5s;
+                }
+            }
+
+            &::placeholder {
+                color: #AAA;
+                transition: 0.3s;
+            }
         }
     }
 </style>
