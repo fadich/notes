@@ -125,6 +125,21 @@ class Repository {
             }
         }
 
+        $num = count($list);
+        for ($i = 0; $i < $num - 1; $i++) {
+            $k = $i + 1;
+            while ($k) {
+                if ($list[$k]['_score'] > $list[$k - 1]['_score']) {
+                    $temp = $list[$k - 1];
+                    $list[$k - 1] = $list[$k];
+                    $list[$k] = $temp;
+                    $k--;
+                    continue;
+                }
+                break;
+            }
+        }
+
         return array_slice($list, $offset, $perPage);
     }
 
