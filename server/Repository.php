@@ -93,17 +93,21 @@ class Repository {
 
     public function search(string $query = '', int $page = 1, int $perPage = 9)
     {
-//        substr_count();
         $offset = $perPage * ($page - 1);
 
         if (!$query) {
-            return array_slice($this->list, $offset, $perPage);
+            $list = array_slice($this->list, $offset, $perPage);
+            foreach ($list as $id => $item) {
+                $list[$id] = array_merge($item, ['id' => $id]);
+            }
+
+            return $list;
         }
 
         $grams = $this->getGrams($query);
         $list = [];
 
-        foreach ($list as $id => $item) {
+        foreach ($this->list as $id => $item) {
             $score = 0.0;
             foreach ($grams as $gram) {
                 $len = strlen($gram);
@@ -124,6 +128,11 @@ class Repository {
         return array_slice($list, $offset, $perPage);
     }
 
+    /**
+     * @param string $word
+     *
+     * @return string[]
+     */
     protected function getGrams(string $word)
     {
         $min = min($this->minN, $this->maxN);
@@ -131,8 +140,8 @@ class Repository {
         $len = strlen($word);
         $grams = [];
 
-        $min = ($min < $len) ? $len : $min;
-        $max = ($max < $len) ? $len : $max;
+        $min = ($min > $len) ? $len : $min;
+        $max = ($max > $len) ? $len : $max;
 
         for ($cur = $min; $cur <= $max; $cur++) {
             foreach (range(0, $len - $cur) as $start) {
