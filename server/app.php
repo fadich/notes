@@ -29,7 +29,6 @@ function hint() {
     writeln("There are simple commands which can be used.");
     writeln();
     writeln("\i\t-\tInsert new note.");
-    writeln("\s\t-\tSearch for note(-s).");
     writeln("Or just type a query...");
 }
 
