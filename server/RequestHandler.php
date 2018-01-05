@@ -50,8 +50,7 @@ class RequestHandler
         }
 
         $cb = $this->routes[$method][$path]['cb'] ?? null;
-        $args = array_merge($this->routes[$method][$path]['args'] ?? [], $args ?? []);
-        $args = array_merge(['request' => $request], $args);
+        $args = array_merge(['request' => $request], $args ?? [], $this->routes[$method][$path]['args'] ?? []);
 
         if (is_callable($cb)) {
             return call_user_func_array($cb, $args);

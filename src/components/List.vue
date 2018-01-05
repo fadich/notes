@@ -55,19 +55,9 @@
 
 <script>
 
-import ES from '../models/es'
+import '../helpers/textarea'
 import Vue from 'vue'
-import textHelper from '../helpers/textarea'
-
-(function () {
-  let socket = new WebSocket('ws://localhost:8010')
-
-  socket.onopen = function () {
-    alert('Соединение установлено.')
-  }
-
-  socket.send('Hello World!')
-})()
+import Repository from '../models/repository'
 
 Vue.component('textfield', {
   template: `
@@ -100,9 +90,7 @@ Vue.component('textfield', {
   }
 })
 
-const HOST = 'localhost:9242'
-const INDEX = 'notes'
-const TYPE = 'note'
+const HOST = 'http://localhost:8000'
 
 let list = {
   name: 'List',
@@ -115,9 +103,7 @@ let list = {
       loading: false,
       pages: 1,
       notes: [],
-      es: null,
-      index: 'notes',
-      type: 'note'
+      repository: null
     }
   },
   methods: {
@@ -126,70 +112,7 @@ let list = {
         this.es.resetPage()
       }
 
-      let body = {}
-
-      if (list.query.length > 2) {
-        body.query = {
-          bool: {
-            must: {
-              bool: {
-                should: [
-                  {
-                    match: {
-                      title: {
-                        query: list.query,
-//                        fuzziness: 1,
-                        operator: 'AND'
-                      }
-                    }
-                  },
-                  {
-                    match: {
-                      content: {
-                        query: list.query,
-//                        fuzziness: 1,
-                        operator: 'AND'
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-      } else {
-        body.sort = [{
-          createdAt: { order: 'desc' }
-        }]
-      }
-
-      this.notes = this.es.search(body)
-
-      setTimeout(function () {
-        textHelper.autoresize()
-        list.loading = false
-      }, 500)
-
-//      list.client.search(params)
-//        .then(function (body) {
-//          if (list.page > 1) {
-//            for (let key in body.hits.hits) {
-//              let hit = body.hits.hits[key]
-//              list.notes.push(hit)
-//            }
-//          } else {
-//            list.pages = Math.ceil(body.hits.total / 10)
-//            list.notes = body.hits.hits
-//          }
-//
-//          setTimeout(function () {
-//            textHelper.autoresize()
-//            list.loading = false
-//          }, 500)
-//        }, function (error) {
-//          console.trace(error.message)
-//          list.loading = false
-//        })
+      this.notes = this.repository.search(this.query)
     },
     addNote (e) {
       if (e) {
@@ -204,9 +127,7 @@ let list = {
       let date = Date.now()
       let body = {
         title: this.title,
-        content: this.content,
-        createdAt: date,
-        updatedAd: date
+        content: this.content
       }
 
       this.client.create({
@@ -277,10 +198,8 @@ let list = {
     }
   },
   mounted () {
-    this.es = new ES({
-      host: HOST,
-      index: INDEX,
-      type: TYPE
+    this.repository = new Repository({
+      host: HOST
     })
 
     this.searchNotes()

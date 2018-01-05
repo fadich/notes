@@ -7,6 +7,7 @@ class Repository {
     protected $minN = 3;
     protected $maxN = 5;
     protected $list = [];
+    protected $lastInsertId;
 
     public function __construct(int $minN = 3, int $maxN = 5)
     {
@@ -47,6 +48,14 @@ class Repository {
     }
 
     /**
+     * @return int|null
+     */
+    public function getLastInsertId()
+    {
+        return $this->lastInsertId;
+    }
+
+    /**
      * @param string $title
      * @param string $content
      *
@@ -54,10 +63,10 @@ class Repository {
      */
     public function addNote(string $title, string $content)
     {
-       $this->list[] = [
+        $this->lastInsertId = array_unshift($this->list, [
             'title' => $title,
             'content' => $content,
-        ];
+        ]);
 
         return $this;
     }
@@ -111,8 +120,8 @@ class Repository {
             $score = 0.0;
             foreach ($grams as $gram) {
                 $len = strlen($gram);
-                $score += (float)(substr_count($item['title'], $gram) * $len);
-                $score += (float)(substr_count($item['content'], $gram) * $len);
+                $score += (substr_count($item['title'], $gram) * $len);
+                $score += (substr_count($item['content'], $gram) * $len);
             }
 
             if ($score) {
@@ -120,7 +129,7 @@ class Repository {
                     'id' => $id,
                     'title' => $item['title'],
                     'content' => $item['content'],
-                    '_score' => $score,
+                    '_score' => (float)$score,
                 ];
             }
         }

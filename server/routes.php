@@ -17,7 +17,6 @@ function update(ServerRequestInterface $request, int $id)
     return RequestHandler::response(['Update.', func_get_args()]);
 }
 
-
 function delete(ServerRequestInterface $request, int $id)
 {
     return RequestHandler::response(['Delete.', func_get_args()]);

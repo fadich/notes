@@ -1,22 +1,18 @@
-let textarea = {}
+(function () {
+  let autoresize = function (ev) {
+    if (ev.target.tagName.toLowerCase() !== 'textarea') {
+      return
+    }
 
-textarea.autoresize = function () {
-  let textarea = document.querySelectorAll('textarea')
-
-  textarea.forEach(function (el) {
-    el.addEventListener('keydown', autosize)
-    el.dispatchEvent(new Event('keydown'))
-  })
-
-  function autosize () {
-    let el = this
+    let el = ev.target
     setTimeout(function () {
+      el.dispatchEvent(new Event('keydown'))
       el.style.cssText = 'height:auto;'
       // for box-sizing other than "content-box" use:
       // el.style.cssText = '-moz-box-sizing:content-box';
       el.style.cssText = 'height:' + (el.scrollHeight + 3) + 'px'
     }, 0)
   }
-}
 
-export default textarea
+  document.body.onkeydown = autoresize
+})()

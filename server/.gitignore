@@ -1,4 +1,4 @@
 vendor
 
 storage.json
-socket/config.php
+composer.lock
