@@ -7,7 +7,7 @@ $rep = new Repository(2,2);
 hint();
 
 while (1) {
-    $insert = readline('Query:');
+    $insert = readline('Query: ');
     switch ($insert) {
         case '\i':
             insert($rep);
@@ -15,6 +15,11 @@ while (1) {
         case '\h':
             hint();
             break;
+        case '\e':
+            writeln("Saving data...");
+            $rep->save();
+
+            exit();
         default:
             $list = $rep->search($insert);
             viewList($list);
@@ -27,9 +32,10 @@ function writeln(string $message = '') {
 
 function hint() {
     writeln("There are simple commands which can be used.");
-    writeln();
-    writeln("\i\t-\tInsert new note.");
+    writeln("\i  -  Insert new note.");
+    writeln("\\e -  Exit program.");
     writeln("Or just type a query...");
+    writeln();
 }
 
 function insert(Repository $rep) {
@@ -50,7 +56,7 @@ function viewList(array $list) {
         $content = $fields[2] ?? $fields['content'] ?? '--';
         $score = $fields[3] ?? $fields['_score'] ?? '--';
 
-        writeln("{$id}\t\t{$title}\t\t{$content}\t\t{$score}");
+        writeln(styledString($id, 5) . styledString($title, 15) . styledString($content, 32) . styledString($score, 6));
     };
 
     $row([
@@ -63,4 +69,18 @@ function viewList(array $list) {
     foreach ($list as $item) {
         $row($item);
     }
+}
+
+function styledString(string $str, $len = 24) {
+    $sLen = strlen($str);
+    if ($sLen > 12) {
+        $str = substr($str, 0, $len - 3);
+        $str .= '...';
+    } else {
+        for ($i = $sLen; $i <= $len; $i++) {
+            $str .= ' ';
+        }
+    }
+
+    return $str;
 }

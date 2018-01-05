@@ -59,6 +59,16 @@ import ES from '../models/es'
 import Vue from 'vue'
 import textHelper from '../helpers/textarea'
 
+(function () {
+  let socket = new WebSocket('ws://localhost:8010')
+
+  socket.onopen = function () {
+    alert('Соединение установлено.')
+  }
+
+  socket.send('Hello World!')
+})()
+
 Vue.component('textfield', {
   template: `
     <div class="textfield">
@@ -286,6 +296,10 @@ export default list
         width: 100%;
         display: flex;
         flex-direction: column;
+
+        textarea {
+            overflow: hidden;
+        }
 
         .table {
             width: 100%;
