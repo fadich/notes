@@ -140,7 +140,7 @@ class Repository {
             }
         }
 
-        return $grams;
+        return array_unique($grams);
     }
 
 }
