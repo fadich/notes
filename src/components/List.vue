@@ -32,13 +32,13 @@
                     <form @change="updateNote(note)">
                         <div class="title">
                             <div class="field-wrap form-group">
-                                <textarea v-model="note._source.title" style="min-height: 150px"></textarea>
+                                <textarea v-model="note.title" style="min-height: 150px"></textarea>
                             </div>
                         </div>
                         <div class="comment">
                             <div class="field-wrap">
                                 <div class="textfield form-group">
-                                    <textarea v-model="note._source.content"></textarea>
+                                    <textarea v-model="note.content"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -109,10 +109,13 @@ let list = {
   methods: {
     searchNotes (reset) {
       if (reset) {
-        this.es.resetPage()
+        this.page = 1
       }
 
-      this.notes = this.repository.search(this.query)
+      let search = this.repository.search(this.query)
+
+      this.notes = search.items
+      this.pages = search.pages
     },
     addNote (e) {
       if (e) {
@@ -123,41 +126,19 @@ let list = {
         return
       }
 
-      let list = this
-      let date = Date.now()
       let body = {
         title: this.title,
         content: this.content
       }
 
-      this.client.create({
-        index: this.index,
-        type: this.type,
-        id: date,
-        body: body
-      }, function (error, response) {
-        let code = error && error.hasOwnProperty('code') ? error.code : null
+      this.repository.create(body)
 
-        if (code >= 300) {
-          console.error(error, response)
-          return false
-        }
+      this.title = ''
+      this.content = ''
 
-        list.title = ''
-        list.content = ''
-      })
+      this.notes.unshift(body)
 
-      this.notes.unshift({
-        _source: body
-      })
-
-      list.page = 1
-
-      // Crutch. Waiting for insert...
-      // Think that ES does not updating immediately
-      setTimeout(function () {
-        list.searchNotes()
-      }, 1250)
+      this.page = 1
     },
     addNoteInput (e) {
       if (e.keyCode === 13 && e.ctrlKey) {
@@ -167,29 +148,15 @@ let list = {
     },
     updateNote (note) {
       let body = {
-        doc: {
-          title: note._source.title,
-          content: note._source.content,
-          createdAt: note._source.date,
-          updatedAd: note._source.date
-        }
+        title: note.title,
+        content: note.content,
+        createdAt: note.date,
+        updatedAd: note.date
       }
 
-      let id = note._id
+      let id = note.id
 
-      this.client.update({
-        index: this.index,
-        type: this.type,
-        id: id,
-        body: body
-      }, function (error, response) {
-        let code = (error && error.hasOwnProperty('code')) ? error.code : null
-
-        if (code >= 300) {
-          console.error(error, response)
-          return false
-        }
-      })
+      this.repository.update(id, body)
     },
     loadMore () {
       this.loading = true

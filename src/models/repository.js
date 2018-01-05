@@ -9,43 +9,16 @@ let Repository = function (parameters) {
     }
   })(parameters)
 
-  let page = 1
-  let pages = 0
-  let loading = false
-
   // let client = 123;
 
-  this.resetPage = function () {
-    page = 1
-    return this
-  }
-
-  this.nextPage = function () {
-    page++
-    return this
-  }
-
-  this.getPages = function () {
-    return pages
-  }
-
-  this.isLastPage = function () {
-    return pages >= page
-  }
-
-  this.search = function (body) {
-    if (loading) {
-      return
-    }
-
+  this.search = function (query, page) {
     let params = {}
-    let entities = []
 
-    loading = true
+    console.log('Searching...')
 
     params.index = config.index
-    params.perPage = 10
     params.page = (page - 1) * params.size
+    params.perPage = 10
 
     /*
     client.search(params, function () {
@@ -66,16 +39,19 @@ let Repository = function (parameters) {
     })
     */
 
-    loading = false
-
-    return entities
+    return {
+      items: [],
+      pages: 0
+    }
   }
 
   this.create = function (body, cb) {
+    console.log('Created')
     return this
   }
 
   this.update = function (id, body, cb) {
+    console.log('Updated')
     return this
   }
 }
