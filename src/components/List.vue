@@ -55,7 +55,7 @@
 
 <script>
 
-import es from 'elasticsearch'
+import ES from '../models/es'
 import Vue from 'vue'
 import textHelper from '../helpers/textarea'
 
@@ -90,6 +90,10 @@ Vue.component('textfield', {
   }
 })
 
+const HOST = 'localhost:9242'
+const INDEX = 'notes'
+const TYPE = 'note'
+
 let list = {
   name: 'List',
   data () {
@@ -101,28 +105,21 @@ let list = {
       loading: false,
       pages: 1,
       notes: [],
-      client: null,
+      es: null,
       index: 'notes',
       type: 'note'
     }
   },
   methods: {
     searchNotes (reset) {
-      let list = this
-      let params = {}
-
       if (reset) {
-        this.page = 1
+        this.es.resetPage()
       }
 
-      params.index = list.index
-      params.size = 10
-      params.from = (list.page - 1) * params.size
-
-      params.body = {}
+      let body = {}
 
       if (list.query.length > 2) {
-        params.body.query = {
+        body.query = {
           bool: {
             must: {
               bool: {
@@ -151,31 +148,38 @@ let list = {
           }
         }
       } else {
-        params.body.sort = [{
+        body.sort = [{
           createdAt: { order: 'desc' }
         }]
       }
 
-      list.client.search(params)
-        .then(function (body) {
-          if (list.page > 1) {
-            for (let key in body.hits.hits) {
-              let hit = body.hits.hits[key]
-              list.notes.push(hit)
-            }
-          } else {
-            list.pages = Math.ceil(body.hits.total / 10)
-            list.notes = body.hits.hits
-          }
+      this.notes = this.es.search(body)
 
-          setTimeout(function () {
-            textHelper.autoresize()
-            list.loading = false
-          }, 500)
-        }, function (error) {
-          console.trace(error.message)
-          list.loading = false
-        })
+      setTimeout(function () {
+        textHelper.autoresize()
+        list.loading = false
+      }, 500)
+
+//      list.client.search(params)
+//        .then(function (body) {
+//          if (list.page > 1) {
+//            for (let key in body.hits.hits) {
+//              let hit = body.hits.hits[key]
+//              list.notes.push(hit)
+//            }
+//          } else {
+//            list.pages = Math.ceil(body.hits.total / 10)
+//            list.notes = body.hits.hits
+//          }
+//
+//          setTimeout(function () {
+//            textHelper.autoresize()
+//            list.loading = false
+//          }, 500)
+//        }, function (error) {
+//          console.trace(error.message)
+//          list.loading = false
+//        })
     },
     addNote (e) {
       if (e) {
@@ -239,6 +243,7 @@ let list = {
           updatedAd: note._source.date
         }
       }
+
       let id = note._id
 
       this.client.update({
@@ -247,7 +252,7 @@ let list = {
         id: id,
         body: body
       }, function (error, response) {
-        let code = error && error.hasOwnProperty('code') ? error.code : null
+        let code = (error && error.hasOwnProperty('code')) ? error.code : null
 
         if (code >= 300) {
           console.error(error, response)
@@ -262,9 +267,10 @@ let list = {
     }
   },
   mounted () {
-    this.client = new es.Client({
-      host: 'localhost:9242',
-      log: 'trace'
+    this.es = new ES({
+      host: HOST,
+      index: INDEX,
+      type: TYPE
     })
 
     this.searchNotes()
