@@ -29,6 +29,9 @@ class Repository {
         $this->save();
     }
 
+    /**
+     * @return static
+     */
     public function save()
     {
         file_put_contents(
@@ -77,9 +80,14 @@ class Repository {
      * @param string $content
      *
      * @return static
+     * @throws \Exception
      */
     public function updateNote(int $id, string $title, string $content)
     {
+        if (!isset($this->list[$id])) {
+            throw new Exception("Note #{$id} does not exists");
+        }
+
         $this->list[$id] = [
             'title' => $title,
             'content' => $content,

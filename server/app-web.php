@@ -13,6 +13,9 @@ use React\Http\Server as Http;
 use React\Socket\Server as Socket;
 use Psr\Http\Message\ServerRequestInterface;
 
+print 'Starting server..';
+sleep(1);
+
 $loop = Factory::create();
 
 $rep = new Repository(2,2);
@@ -26,7 +29,14 @@ $server = new Http(function (ServerRequestInterface $request) use ($rep, $http) 
     return $http->getResponse($request);
 });
 
-$socket = new Socket($config['port'], $loop);
-$server->listen($socket);
+try {
+    $socket = new Socket($config['port'], $loop);
+    $server->listen($socket);
+} catch (Exception $e) {
+    print "\rError: " . $e->getMessage();
+    die;
+}
+
+print "\rListening to port " . $config['port'] . "...";
 
 $loop->run();

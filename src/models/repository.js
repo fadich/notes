@@ -25,19 +25,11 @@ let Repository = function (parameters) {
   this.search = function (query, page) {
     let params = {}
 
-    console.log('Searching...')
-
     params.index = config.index
     params.page = (page - 1) * params.size
     params.perPage = 10
 
-    client.get('/', params)
-      .then(function (response) {
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+    return client.get('/', params)
 
     /*
     client.search(params, function () {
@@ -57,11 +49,6 @@ let Repository = function (parameters) {
       console.trace(error.message)
     })
     */
-
-    return {
-      items: [],
-      pages: 0
-    }
   }
 
   this.create = function (body, cb) {
@@ -69,9 +56,8 @@ let Repository = function (parameters) {
     return this
   }
 
-  this.update = function (id, body, cb) {
-    console.log('Updating...')
-    return this
+  this.update = function (id, body) {
+    return client.post('/' + id, body)
   }
 }
 

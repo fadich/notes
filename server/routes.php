@@ -40,7 +40,34 @@ function insert(ServerRequestInterface $request, Repository $repository) {
 }
 
 function update(ServerRequestInterface $request, int $id, Repository $repository) {
-    return RequestHandler::response(['Update.', func_get_args()]);
+    $body = $request->getParsedBody();
+    if (!isset($body['title']) || !$body['title']) {
+        return RequestHandler::response([
+            'success' => false,
+            'message' => 'Field "title" required',
+        ], 400);
+    }
+    if (!isset($body['id'])) {
+        return RequestHandler::response([
+            'success' => false,
+            'message' => 'Field "id" required',
+        ], 400);
+    }
+
+    try {
+        $repository->updateNote($body['id'], $body['title'], $body['content'] ?? '')->save();
+    } catch (Exception $e) { // CATCH
+        return RequestHandler::response([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ]);
+    }
+
+    return RequestHandler::response([
+        'success' => true,
+        'message' => 'Successfully updated',
+        'item' => $body,
+    ]);
 }
 
 function delete(ServerRequestInterface $request, int $id, Repository $repository) {

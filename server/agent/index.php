@@ -20,4 +20,9 @@ header('Content-Type: application/json');
 
 $data = file_get_contents($server . $uri, false, $context);
 
-echo $data;
+//if ($data) {
+    echo $data;
+//} else {
+//    http_response_code(404);
+//    echo "Error";
+//}

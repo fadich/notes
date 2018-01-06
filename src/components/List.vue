@@ -112,10 +112,20 @@ let list = {
         this.page = 1
       }
 
-      let search = this.repository.search(this.query)
+      let t = function (response) {
+        let data = response.data[0]
 
-      this.notes = search.items
-      this.pages = search.pages
+        if (data) {
+          this.notes = data.items
+          this.pages = data.pages
+        }
+      }
+
+      this.repository.search(this.query)
+        .then(t.bind(this))
+        .catch(function (error) {
+          console.log(error)
+        })
     },
     addNote (e) {
       if (e) {
