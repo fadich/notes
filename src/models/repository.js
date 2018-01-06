@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 let Repository = function (parameters) {
   let config = (function (params) {
     if (!arguments) {
@@ -9,7 +11,16 @@ let Repository = function (parameters) {
     }
   })(parameters)
 
-  // let client = 123;
+  let client = axios.create({
+    baseURL: config.host,
+    timeout: 2000,
+    withCredentials: true,
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
 
   this.search = function (query, page) {
     let params = {}
@@ -19,6 +30,14 @@ let Repository = function (parameters) {
     params.index = config.index
     params.page = (page - 1) * params.size
     params.perPage = 10
+
+    client.get('/', params)
+      .then(function (response) {
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
 
     /*
     client.search(params, function () {
@@ -46,12 +65,12 @@ let Repository = function (parameters) {
   }
 
   this.create = function (body, cb) {
-    console.log('Created')
+    console.log('Creating...')
     return this
   }
 
   this.update = function (id, body, cb) {
-    console.log('Updated')
+    console.log('Updating...')
     return this
   }
 }

@@ -15,7 +15,9 @@ $options = [
 ];
 
 $context  = stream_context_create($options);
-$data = file_get_contents($server . $uri, false, $context);
 
 header('Content-Type: application/json');
+
+$data = file_get_contents($server . $uri, false, $context);
+
 echo $data;

@@ -18,8 +18,8 @@ $loop = Factory::create();
 $rep = new Repository(2,2);
 $http = new RequestHandler($rep);
 $http->addRoute('/', 'get', 'search', ['repository' => $rep]);
-$http->addRoute('/', 'put', 'insert', ['repository' => $rep]);
-$http->addRoute('/{id}', 'put', 'update', ['repository' => $rep]);
+$http->addRoute('/', 'post', 'insert', ['repository' => $rep]);
+$http->addRoute('/{id}', 'post', 'update', ['repository' => $rep]);
 $http->addRoute('/{id}', 'delete', 'delete', ['repository' => $rep]);
 
 $server = new Http(function (ServerRequestInterface $request) use ($rep, $http) {

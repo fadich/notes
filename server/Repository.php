@@ -110,7 +110,10 @@ class Repository {
                 $list[$id] = array_merge($item, ['id' => $id]);
             }
 
-            return $list;
+            return [
+                'items' => $list,
+                'pages' => ceil(count($this->list) / $perPage),
+            ];
         }
 
         $grams = $this->getGrams($query);
@@ -149,7 +152,10 @@ class Repository {
             }
         }
 
-        return array_slice($list, $offset, $perPage);
+        return [
+            'items' => array_slice($list, $offset, $perPage),
+            'pages' => ceil(count($list) / $perPage),
+        ];
     }
 
     /**
