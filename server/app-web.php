@@ -34,6 +34,7 @@ $http->addRoute('/', 'get', 'search', ['repository' => $rep]);
 $http->addRoute('/', 'post', 'insert', ['repository' => $rep]);
 $http->addRoute('/{id}', 'post', 'update', ['repository' => $rep]);
 $http->addRoute('/{id}', 'delete', 'delete', ['repository' => $rep]);
+$http->addRoute('/delete', 'post', 'deleteNew', ['repository' => $rep]);
 
 $server = new Http(function (ServerRequestInterface $request) use ($rep, $http) {
     try {

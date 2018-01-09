@@ -74,7 +74,9 @@ let Repository = function (parameters) {
   }
 
   this.delete = function (id) {
-    return client.post('/delete/' + id)
+    // return client.delete('/' + id)
+
+    return client.post('/delete?id=' + id)
   }
 }
 

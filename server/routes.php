@@ -73,5 +73,37 @@ function update(ServerRequestInterface $request, int $id, Repository $repository
 }
 
 function delete(ServerRequestInterface $request, int $id, Repository $repository, RequestHandler $handler) {
-    return RequestHandler::response(['Delete.', func_get_args()], 200, $handler->headers);
+    try {
+        $repository->deleteNote($id)->save();
+    } catch (Exception $e) { // CATCH
+        return RequestHandler::response([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 400, $handler->headers);
+    }
+
+    return RequestHandler::response(['Deleted'], 200, $handler->headers);
+}
+
+function deleteNew(ServerRequestInterface $request, Repository $repository, RequestHandler $handler) {
+    $params = $request->getQueryParams();
+    $id = $params['id'] ?? null;
+
+    if ($id === null) {
+        return RequestHandler::response([
+            'success' => false,
+            'message' => 'ID does not specified',
+        ], 400, $handler->headers);
+    }
+
+    try {
+        $repository->deleteNote($id)->save();
+    } catch (Exception $e) { // CATCH
+        return RequestHandler::response([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 400, $handler->headers);
+    }
+
+    return RequestHandler::response(['Deleted'], 200, $handler->headers);
 }

@@ -180,6 +180,7 @@ let list = {
     deleteNote (note) {
       if (confirm('Are you sure?')) {
         this.repository.delete(note.id)
+        this.notes.splice(note.id, 1)
       }
     },
     loadMore () {
