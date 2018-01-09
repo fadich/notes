@@ -2,7 +2,7 @@
 
 use \Psr\Http\Message\ServerRequestInterface;
 
-function search(ServerRequestInterface $request, Repository $repository) {
+function search(ServerRequestInterface $request, Repository $repository, RequestHandler $handler) {
     $params = $request->getQueryParams();
     $query = $params['query'] ?? '';
 
@@ -17,16 +17,16 @@ function search(ServerRequestInterface $request, Repository $repository) {
 
     return RequestHandler::response([
         $items,
-    ]);
+    ], 200, $handler->headers);
 }
 
-function insert(ServerRequestInterface $request, Repository $repository) {
+function insert(ServerRequestInterface $request, Repository $repository, RequestHandler $handler) {
     $body = $request->getParsedBody();
     if (!isset($body['title']) || !$body['title']) {
         return RequestHandler::response([
             'success' => false,
             'message' => 'Field "title" required',
-        ], 400);
+        ], 400, $handler->headers);
     }
 
     $repository->addNote($body['title'], $body['content'] ?? '')->save();
@@ -36,22 +36,22 @@ function insert(ServerRequestInterface $request, Repository $repository) {
         'success' => true,
         'message' => 'Successfully created',
         'item' => $body,
-    ]);
+    ], 200, $handler->headers);
 }
 
-function update(ServerRequestInterface $request, int $id, Repository $repository) {
+function update(ServerRequestInterface $request, int $id, Repository $repository, RequestHandler $handler) {
     $body = $request->getParsedBody();
     if (!isset($body['title']) || !$body['title']) {
         return RequestHandler::response([
             'success' => false,
             'message' => 'Field "title" required',
-        ], 400);
+        ], 400, $handler->headers);
     }
     if (!isset($body['id'])) {
         return RequestHandler::response([
             'success' => false,
             'message' => 'Field "id" required',
-        ], 400);
+        ], 400, $handler->headers);
     }
 
     try {
@@ -60,16 +60,16 @@ function update(ServerRequestInterface $request, int $id, Repository $repository
         return RequestHandler::response([
             'success' => false,
             'message' => $e->getMessage(),
-        ]);
+        ], 400, $handler->headers);
     }
 
     return RequestHandler::response([
         'success' => true,
         'message' => 'Successfully updated',
         'item' => $body,
-    ]);
+    ], 200, $handler->headers);
 }
 
-function delete(ServerRequestInterface $request, int $id, Repository $repository) {
-    return RequestHandler::response(['Delete.', func_get_args()]);
+function delete(ServerRequestInterface $request, int $id, Repository $repository, RequestHandler $handler) {
+    return RequestHandler::response(['Delete.', func_get_args()], 200, $handler->headers);
 }

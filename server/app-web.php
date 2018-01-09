@@ -20,7 +20,14 @@ $loop = Factory::create();
 
 $rep = new Repository(2,2);
 $http = new RequestHandler($rep);
-$http->addRoute('/', 'get', 'search', ['repository' => $rep]);
+$http->headers = [
+    'Content-Type'                     => 'application/json',
+    'Access-Control-Allow-Credentials' => 'true',
+    'Access-Control-Allow-Origin'      => $config['client'],
+    'Access-Control-Allow-Headers'     => 'X-Requested-With, Content-Type',
+];
+
+$http->addRoute('/', ['get', 'options'], 'search', ['repository' => $rep]);
 $http->addRoute('/', 'post', 'insert', ['repository' => $rep]);
 $http->addRoute('/{id}', 'post', 'update', ['repository' => $rep]);
 $http->addRoute('/{id}', 'delete', 'delete', ['repository' => $rep]);

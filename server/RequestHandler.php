@@ -3,6 +3,11 @@
 class RequestHandler
 {
     /**
+     * @var array
+     */
+    public $headers = [];
+
+    /**
      * @var \Repository
      */
     protected $rep;
@@ -22,10 +27,20 @@ class RequestHandler
         $this->rep = $repository;
     }
 
-    public function addRoute(string $path, string $method, Callable $callback, array $args = [])
+    /**
+     * @param string $path
+     * @param string|string[] $method
+     * @param callable $callback
+     * @param array $args
+     */
+    public function addRoute(string $path, $method, Callable $callback, array $args = [])
     {
-        $this->routes[$method][$path]['cb'] = $callback;
-        $this->routes[$method][$path]['args'] = $args;
+        $methods = is_array($method) ? $method : [$method];
+
+        foreach ($methods as $method) {
+            $this->routes[$method][$path]['cb'] = $callback;
+            $this->routes[$method][$path]['args'] = $args;
+        }
     }
 
     public function getResponse(\Psr\Http\Message\ServerRequestInterface $request)
@@ -50,7 +65,14 @@ class RequestHandler
         }
 
         $cb = $this->routes[$method][$path]['cb'] ?? null;
-        $args = array_merge(['request' => $request], $args ?? [], $this->routes[$method][$path]['args'] ?? []);
+        $args = array_merge(
+            [
+                'request' => $request,
+            ],
+            $args ?? [],
+            $this->routes[$method][$path]['args'] ?? [],
+            [$this]
+        );
 
         if (is_callable($cb)) {
             return call_user_func_array($cb, $args);
@@ -59,13 +81,11 @@ class RequestHandler
         return static::response("Not found.", 404);
     }
 
-    public static function response($data, int $code = 200)
+    public static function response($data, int $code = 200, array $headers = [])
     {
         return new \React\Http\Response(
             $code,
-            [
-                'Content-Type' => 'application/json'
-            ],
+            $headers,
             json_encode($data)
         );
     }

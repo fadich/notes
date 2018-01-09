@@ -90,7 +90,7 @@ Vue.component('textfield', {
   }
 })
 
-const HOST = 'http://na.loc'
+const HOST = 'http://localhost:8010/'
 
 let list = {
   name: 'List',
