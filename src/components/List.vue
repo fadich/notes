@@ -29,16 +29,16 @@
             </div>
             <div class="body">
                 <div class="body-row" v-for="note in notes">
-                    <form @change="updateNote(note)">
+                    <form @change="updateNote(note)" @keydown="noteForm(note, $event)">
                         <div class="title">
                             <div class="field-wrap form-group">
-                                <textarea v-model="note._source.title" style="min-height: 150px"></textarea>
+                                <textarea v-model="note.title" style="min-height: 150px"></textarea>
                             </div>
                         </div>
                         <div class="comment">
                             <div class="field-wrap">
                                 <div class="textfield form-group">
-                                    <textarea v-model="note._source.content"></textarea>
+                                    <textarea v-model="note.content"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <a @click="loadMore()" @mouseover="loadMore()" class="load-more" v-if="page < pages">Load more</a>
+        <a @click="loadMore()" class="load-more" v-if="page < pages">Load more</a>
 
         <hr>
     </div>
@@ -55,9 +55,9 @@
 
 <script>
 
-import es from 'elasticsearch'
+import '../helpers/textarea'
 import Vue from 'vue'
-import textHelper from '../helpers/textarea'
+import Repository from '../models/repository'
 
 Vue.component('textfield', {
   template: `
@@ -90,6 +90,8 @@ Vue.component('textfield', {
   }
 })
 
+const HOST = 'http://localhost:8010/'
+
 let list = {
   name: 'List',
   data () {
@@ -101,80 +103,30 @@ let list = {
       loading: false,
       pages: 1,
       notes: [],
-      client: null,
-      index: 'notes',
-      type: 'note'
+      repository: null
     }
   },
   methods: {
     searchNotes (reset) {
-      let list = this
-      let params = {}
-
       if (reset) {
+        this.notes = []
         this.page = 1
       }
 
-      params.index = list.index
-      params.size = 10
-      params.from = (list.page - 1) * params.size
+      let t = function (response) {
+        let data = response.data[0]
 
-      params.body = {}
-
-      if (list.query.length > 2) {
-        params.body.query = {
-          bool: {
-            must: {
-              bool: {
-                should: [
-                  {
-                    match: {
-                      title: {
-                        query: list.query,
-//                        fuzziness: 1,
-                        operator: 'AND'
-                      }
-                    }
-                  },
-                  {
-                    match: {
-                      content: {
-                        query: list.query,
-//                        fuzziness: 1,
-                        operator: 'AND'
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
+        if (data) {
+          this.notes = Array.concat(this.notes, data.items)
+          this.pages = data.pages
         }
-      } else {
-        params.body.sort = [{
-          createdAt: { order: 'desc' }
-        }]
+        console.log(this.notes)
       }
 
-      list.client.search(params)
-        .then(function (body) {
-          if (list.page > 1) {
-            for (let key in body.hits.hits) {
-              let hit = body.hits.hits[key]
-              list.notes.push(hit)
-            }
-          } else {
-            list.pages = Math.ceil(body.hits.total / 10)
-            list.notes = body.hits.hits
-          }
-
-          setTimeout(function () {
-            textHelper.autoresize()
-            list.loading = false
-          }, 500)
-        }, function (error) {
-          console.trace(error.message)
-          list.loading = false
+      this.repository.search(this.query, this.page)
+        .then(t.bind(this))
+        .catch(function (error) {
+          console.log(error)
         })
     },
     addNote (e) {
@@ -186,43 +138,17 @@ let list = {
         return
       }
 
-      let list = this
-      let date = Date.now()
       let body = {
         title: this.title,
-        content: this.content,
-        createdAt: date,
-        updatedAd: date
+        content: this.content
       }
 
-      this.client.create({
-        index: this.index,
-        type: this.type,
-        id: date,
-        body: body
-      }, function (error, response) {
-        let code = error && error.hasOwnProperty('code') ? error.code : null
+      this.repository.create(body)
 
-        if (code >= 300) {
-          console.error(error, response)
-          return false
-        }
+      this.title = ''
+      this.content = ''
 
-        list.title = ''
-        list.content = ''
-      })
-
-      this.notes.unshift({
-        _source: body
-      })
-
-      list.page = 1
-
-      // Crutch. Waiting for insert...
-      // Think that ES does not updating immediately
-      setTimeout(function () {
-        list.searchNotes()
-      }, 1250)
+      this.notes.unshift(body)
     },
     addNoteInput (e) {
       if (e.keyCode === 13 && e.ctrlKey) {
@@ -232,28 +158,34 @@ let list = {
     },
     updateNote (note) {
       let body = {
-        doc: {
-          title: note._source.title,
-          content: note._source.content,
-          createdAt: note._source.date,
-          updatedAd: note._source.date
+        title: note.title,
+        content: note.content,
+        createdAt: note.date,
+        updatedAd: note.date
+      }
+
+      this.repository.update(note._id, body)
+    },
+    noteForm (note, ev) {
+      if (ev.code === 'Delete' && (ev.shiftKey || ev.ctrlKey)) {
+        this.deleteNote(note)
+      }
+      if (ev.code === 'Enter' && ev.ctrlKey) {
+        this.updateNote(note)
+      }
+    },
+    deleteNote (note) {
+      if (confirm('Are you sure?')) {
+        this.repository.delete(note._id)
+
+        for (let k in this.notes) {
+          console.log(k, this.notes[k])
+          if (this.notes[k]['_id'] === note._id) {
+            this.notes.splice(k, 1)
+            break
+          }
         }
       }
-      let id = note._id
-
-      this.client.update({
-        index: this.index,
-        type: this.type,
-        id: id,
-        body: body
-      }, function (error, response) {
-        let code = error && error.hasOwnProperty('code') ? error.code : null
-
-        if (code >= 300) {
-          console.error(error, response)
-          return false
-        }
-      })
     },
     loadMore () {
       this.loading = true
@@ -262,9 +194,8 @@ let list = {
     }
   },
   mounted () {
-    this.client = new es.Client({
-      host: 'localhost:9242',
-      log: 'trace'
+    this.repository = new Repository({
+      host: HOST
     })
 
     this.searchNotes()
@@ -280,6 +211,10 @@ export default list
         width: 100%;
         display: flex;
         flex-direction: column;
+
+        textarea {
+            overflow: hidden;
+        }
 
         .table {
             width: 100%;

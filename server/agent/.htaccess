@@ -1,0 +1,36 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews
+    </IfModule>
+
+    RewriteEngine On
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    Header set Access-Control-Allow-Origin "http://localhost:8080"
+    Header set Access-Control-Allow-Credentials "true"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+
+
+#    RewriteCond %{HTTPS} off
+    # First rewrite to HTTPS:
+    # Don't put www. here. If it is already there it will be included, if not
+    # the subsequent rule will catch it.
+#    RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # Now, rewrite any request to the wrong domain to use www.
+    # [NC] is a case-insensitive match
+#    RewriteCond %{HTTP_HOST} !^www\. [NC]
+#    RewriteRule .* https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
