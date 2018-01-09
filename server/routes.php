@@ -2,6 +2,14 @@
 
 use \Psr\Http\Message\ServerRequestInterface;
 
+function ping () {
+    $args = func_get_args();
+    /** @var \RequestHandler $handler */
+    $handler = end($args);
+
+    return RequestHandler::response(['OK'], 200, $handler->headers);
+}
+
 function search(ServerRequestInterface $request, Repository $repository, RequestHandler $handler) {
     $params = $request->getQueryParams();
     $query = $params['query'] ?? '';
@@ -47,15 +55,9 @@ function update(ServerRequestInterface $request, int $id, Repository $repository
             'message' => 'Field "title" required',
         ], 400, $handler->headers);
     }
-    if (!isset($body['id'])) {
-        return RequestHandler::response([
-            'success' => false,
-            'message' => 'Field "id" required',
-        ], 400, $handler->headers);
-    }
 
     try {
-        $repository->updateNote($body['id'], $body['title'], $body['content'] ?? '')->save();
+        $repository->updateNote($id, $body['title'], $body['content'] ?? '')->save();
     } catch (Exception $e) { // CATCH
         return RequestHandler::response([
             'success' => false,

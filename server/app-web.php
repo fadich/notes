@@ -27,13 +27,22 @@ $http->headers = [
     'Access-Control-Allow-Headers'     => 'X-Requested-With, Content-Type',
 ];
 
-$http->addRoute('/', ['get', 'options'], 'search', ['repository' => $rep]);
+$http->addRoute('/', 'options', 'ping', []);
+$http->addRoute('/{any}', 'options', 'ping', []);
+// REST
+$http->addRoute('/', 'get', 'search', ['repository' => $rep]);
 $http->addRoute('/', 'post', 'insert', ['repository' => $rep]);
 $http->addRoute('/{id}', 'post', 'update', ['repository' => $rep]);
 $http->addRoute('/{id}', 'delete', 'delete', ['repository' => $rep]);
 
 $server = new Http(function (ServerRequestInterface $request) use ($rep, $http) {
-    return $http->getResponse($request);
+    try {
+        return $http->getResponse($request);
+    } catch (Exception $e) {
+        return RequestHandler::response([
+            'message' => $e->getMessage(),
+        ], 500, $http->headers);
+    }
 });
 
 try {

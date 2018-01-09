@@ -7,7 +7,8 @@ let Repository = function (parameters) {
     }
 
     return {
-      host: params.host || null
+      host: params.host || null,
+      perPage: 10
     }
   })(parameters)
 
@@ -17,19 +18,32 @@ let Repository = function (parameters) {
     withCredentials: true,
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
       'X-Requested-With': 'XMLHttpRequest'
     }
   })
 
+  let serialize = function (obj) {
+    let str = []
+    for (let p in obj) {
+      if (obj.hasOwnProperty(p)) {
+        str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]))
+      }
+    }
+
+    return str.join('&')
+  }
+
   this.search = function (query, page) {
     let params = {}
 
-    params.index = config.index
-    params.page = (page - 1) * params.size
-    params.perPage = 10
+    page = page || 1
 
-    return client.get('/', params)
+    params.query = query
+    params['per-page'] = config.perPage
+    params.page = (page - 1) * config.perPage
+
+    return client.get('/?' + serialize(params))
 
     /*
     client.search(params, function () {
@@ -51,13 +65,12 @@ let Repository = function (parameters) {
     */
   }
 
-  this.create = function (body, cb) {
-    console.log('Creating...')
-    return this
+  this.create = function (body) {
+    return client.post('/', serialize(body))
   }
 
   this.update = function (id, body) {
-    return client.post('/' + id, body)
+    return client.post('/' + id, serialize(body))
   }
 }
 

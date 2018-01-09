@@ -131,8 +131,8 @@ class Repository {
             $score = 0.0;
             foreach ($grams as $gram) {
                 $len = strlen($gram);
-                $score += (substr_count($item['title'], $gram) * $len);
-                $score += (substr_count($item['content'], $gram) * $len);
+                $score += (substr_count(strtolower($item['title']), $gram) * $len);
+                $score += (substr_count(strtolower($item['content']), $gram) * $len);
             }
 
             if ($score) {

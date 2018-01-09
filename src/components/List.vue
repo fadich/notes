@@ -109,6 +109,7 @@ let list = {
   methods: {
     searchNotes (reset) {
       if (reset) {
+        this.notes = []
         this.page = 1
       }
 
@@ -116,12 +117,12 @@ let list = {
         let data = response.data[0]
 
         if (data) {
-          this.notes = data.items
+          this.notes = Array.concat(this.notes, data.items)
           this.pages = data.pages
         }
       }
 
-      this.repository.search(this.query)
+      this.repository.search(this.query, this.page)
         .then(t.bind(this))
         .catch(function (error) {
           console.log(error)
@@ -180,6 +181,7 @@ let list = {
     })
 
     this.searchNotes()
+    this.page++
   }
 }
 
