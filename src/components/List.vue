@@ -29,7 +29,7 @@
             </div>
             <div class="body">
                 <div class="body-row" v-for="note in notes">
-                    <form @change="updateNote(note)">
+                    <form @change="updateNote(note)" @keydown="noteForm(note, $event)">
                         <div class="title">
                             <div class="field-wrap form-group">
                                 <textarea v-model="note.title" style="min-height: 150px"></textarea>
@@ -168,6 +168,19 @@ let list = {
       let id = note.id
 
       this.repository.update(id, body)
+    },
+    noteForm (note, ev) {
+      if (ev.code === 'Delete' && (ev.shiftKey || ev.ctrlKey)) {
+        this.deleteNote(note)
+      }
+      if (ev.code === 'Enter' && ev.ctrlKey) {
+        this.updateNote(note)
+      }
+    },
+    deleteNote (note) {
+      if (confirm('Are you sure?')) {
+        this.repository.delete(note.id)
+      }
     },
     loadMore () {
       this.loading = true

@@ -72,6 +72,10 @@ let Repository = function (parameters) {
   this.update = function (id, body) {
     return client.post('/' + id, serialize(body))
   }
+
+  this.delete = function (id) {
+    return client.post('/delete/' + id)
+  }
 }
 
 export default Repository
