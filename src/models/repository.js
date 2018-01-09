@@ -37,11 +37,9 @@ let Repository = function (parameters) {
   this.search = function (query, page) {
     let params = {}
 
-    page = page || 1
-
     params.query = query
     params['per-page'] = config.perPage
-    params.page = (page - 1) * config.perPage
+    params.page = page || 1
 
     return client.get('/?' + serialize(params))
 

@@ -7,7 +7,6 @@ class Repository {
     protected $minN = 3;
     protected $maxN = 5;
     protected $list = [];
-    protected $lastInsertId;
 
     public function __construct(int $minN = 3, int $maxN = 5)
     {
@@ -51,14 +50,6 @@ class Repository {
     }
 
     /**
-     * @return int|null
-     */
-    public function getLastInsertId()
-    {
-        return $this->lastInsertId;
-    }
-
-    /**
      * @param string $title
      * @param string $content
      *
@@ -66,10 +57,14 @@ class Repository {
      */
     public function addNote(string $title, string $content)
     {
-        $this->lastInsertId = array_unshift($this->list, [
-            'title' => $title,
-            'content' => $content,
-        ]);
+        $id = (int)floor(microtime(true) * 1000);
+        $this->list = [
+            $id => [
+                '_id'     => $id,
+                'title'   => $title,
+                'content' => $content,
+            ],
+        ] + $this->list;
 
         return $this;
     }
@@ -88,10 +83,8 @@ class Repository {
             throw new Exception("Note #{$id} does not exists");
         }
 
-        $this->list[$id] = [
-            'title' => $title,
-            'content' => $content,
-        ];
+        $this->list[$id]['title'] = $title;
+        $this->list[$id]['content'] = $content;
 
         return $this;
     }
@@ -114,9 +107,6 @@ class Repository {
 
         if (!$query) {
             $list = array_slice($this->list, $offset, $perPage);
-            foreach ($list as $id => $item) {
-                $list[$id] = array_merge($item, ['id' => $id]);
-            }
 
             return [
                 'items' => $list,
@@ -127,7 +117,7 @@ class Repository {
         $grams = $this->getGrams($query);
         $list = [];
 
-        foreach ($this->list as $id => $item) {
+        foreach ($this->list as $item) {
             $score = 0.0;
             foreach ($grams as $gram) {
                 $len = strlen($gram);
@@ -136,12 +126,8 @@ class Repository {
             }
 
             if ($score) {
-                $list[] = [
-                    'id' => $id,
-                    'title' => $item['title'],
-                    'content' => $item['content'],
-                    '_score' => (float)$score,
-                ];
+                $item['_score'] = (float)$score;
+                $list[] = $item;
             }
         }
 

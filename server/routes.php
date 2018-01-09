@@ -38,7 +38,6 @@ function insert(ServerRequestInterface $request, Repository $repository, Request
     }
 
     $repository->addNote($body['title'], $body['content'] ?? '')->save();
-    $body['id'] = $repository->getLastInsertId();
 
     return RequestHandler::response([
         'success' => true,

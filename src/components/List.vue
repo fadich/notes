@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <a @click="loadMore()" @mouseover="loadMore()" class="load-more" v-if="page < pages">Load more</a>
+        <a @click="loadMore()" class="load-more" v-if="page < pages">Load more</a>
 
         <hr>
     </div>
@@ -120,6 +120,7 @@ let list = {
           this.notes = Array.concat(this.notes, data.items)
           this.pages = data.pages
         }
+        console.log(this.notes)
       }
 
       this.repository.search(this.query, this.page)
@@ -148,8 +149,6 @@ let list = {
       this.content = ''
 
       this.notes.unshift(body)
-
-      this.page = 1
     },
     addNoteInput (e) {
       if (e.keyCode === 13 && e.ctrlKey) {
@@ -165,9 +164,7 @@ let list = {
         updatedAd: note.date
       }
 
-      let id = note.id
-
-      this.repository.update(id, body)
+      this.repository.update(note._id, body)
     },
     noteForm (note, ev) {
       if (ev.code === 'Delete' && (ev.shiftKey || ev.ctrlKey)) {
@@ -179,8 +176,15 @@ let list = {
     },
     deleteNote (note) {
       if (confirm('Are you sure?')) {
-        this.repository.delete(note.id)
-        this.notes.splice(note.id, 1)
+        this.repository.delete(note._id)
+
+        for (let k in this.notes) {
+          console.log(k, this.notes[k])
+          if (this.notes[k]['_id'] === note._id) {
+            this.notes.splice(k, 1)
+            break
+          }
+        }
       }
     },
     loadMore () {
@@ -195,7 +199,6 @@ let list = {
     })
 
     this.searchNotes()
-    this.page++
   }
 }
 
