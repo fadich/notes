@@ -28,6 +28,36 @@ function search(ServerRequestInterface $request, Repository $repository, Request
     ], 200, $handler->headers);
 }
 
+function save(ServerRequestInterface $request, RequestHandler $handler) {
+    $body = $request->getParsedBody();
+    if (!isset($body['data'])) {
+        return RequestHandler::response([
+            'success' => false,
+            'message' => 'Data does not set',
+        ], 400, $handler->headers);
+    }
+
+    if (json_decode($body['data']) === null) {
+        return RequestHandler::response([
+            'success' => false,
+            'message' => 'Invalid data',
+        ], 406, $handler->headers);
+    }
+
+    file_put_contents('storage.json', $body['data']);
+    return RequestHandler::response([
+        'success' => false,
+        'message' => 'Saved',
+    ], 200, $handler->headers);
+}
+
+function get(ServerRequestInterface $request, RequestHandler $handler) {
+    $data = file_get_contents('storage.json');
+    return RequestHandler::response([
+        'data' => $data,
+    ], 200, $handler->headers);
+}
+
 function insert(ServerRequestInterface $request, Repository $repository, RequestHandler $handler) {
     $body = $request->getParsedBody();
     if (!isset($body['title']) || !$body['title']) {

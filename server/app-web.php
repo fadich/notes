@@ -32,6 +32,8 @@ $http->addRoute('/{any}', 'options', 'ping', []);
 // REST
 $http->addRoute('/', 'get', 'search', ['repository' => $rep]);
 $http->addRoute('/', 'post', 'insert', ['repository' => $rep]);
+$http->addRoute('/save', 'post', 'save');
+$http->addRoute('/get', 'get', 'get');
 $http->addRoute('/{id}', 'post', 'update', ['repository' => $rep]);
 $http->addRoute('/{id}', 'delete', 'delete', ['repository' => $rep]);
 $http->addRoute('/delete', 'post', 'deleteNew', ['repository' => $rep]);

@@ -113,21 +113,12 @@ let list = {
         this.page = 1
       }
 
-      let t = function (response) {
-        let data = response.data[0]
+      let data = this.repository.search(this.query, this.page)
 
-        if (data) {
-          this.notes = Array.concat(this.notes, data.items)
-          this.pages = data.pages
-        }
-        console.log(this.notes)
+      if (data) {
+        this.notes = Array.concat(this.notes, data.items)
+        this.pages = data.pages
       }
-
-      this.repository.search(this.query, this.page)
-        .then(t.bind(this))
-        .catch(function (error) {
-          console.log(error)
-        })
     },
     addNote (e) {
       if (e) {
@@ -164,6 +155,7 @@ let list = {
         updatedAd: note.date
       }
 
+      this.repository.save(this.notes)
       this.repository.update(note._id, body)
     },
     noteForm (note, ev) {
