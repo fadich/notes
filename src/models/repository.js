@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const IS_DEV = process.env.NODE_ENV === 'development'
 const APP_URL = encodeURI(IS_DEV ? 'http://localhost:8080/#/' : 'https://notes.royallib.pw')
-const BASE_URL = IS_DEV ? 'http://org.loc/' : 'https://www.org.royallib.pw/'
+const BASE_URL = IS_DEV ? 'http://org.loc/' : 'https://www.auth.royallib.pw/'
 const AUTH_URL = BASE_URL + 'auth/?land-to=' + APP_URL
 
 let Repository = function (parameters) {
