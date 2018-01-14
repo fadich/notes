@@ -155,13 +155,13 @@ let list = {
     },
     noteForm (index, note, ev) {
       if (ev.code === 'Delete' && (ev.shiftKey || ev.ctrlKey)) {
-        this.deleteNote(index, note)
+        this.deleteNote(index)
       }
       if (ev.code === 'Enter' && ev.ctrlKey) {
         this.updateNote(index, note)
       }
     },
-    deleteNote (index, note) {
+    deleteNote (index) {
       if (confirm('Are you sure?')) {
         this.repository.delete(index)
 
@@ -177,7 +177,7 @@ let list = {
   mounted () {
     this.repository = new Repository()
 
-    this.searchNotes()
+    setTimeout(this.searchNotes, 1000)
   }
 }
 
