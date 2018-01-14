@@ -40,17 +40,6 @@ let Repository = function (parameters) {
       }
     })
 
-  // let serialize = function (obj) {
-  //   let str = []
-  //   for (let p in obj) {
-  //     if (obj.hasOwnProperty(p)) {
-  //       str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]))
-  //     }
-  //   }
-  //
-  //   return str.join('&')
-  // }
-
   this.search = function (query, page) {
     let res = {}
 
@@ -58,40 +47,26 @@ let Repository = function (parameters) {
     res.pages = Math.ceil(list.length / config.perPage)
 
     return res
-
-    /*
-    client.search(params, function () {
-      if (page > 1) {
-        for (let key in body.hits.hits) {
-          let hit = body.hits.hits.hasOwnProperty(key) ? body.hits.hits[key] : null
-
-          if (hit) {
-            entities.push(hit)
-          }
-        }
-      } else {
-        pages = Math.ceil(body.hits.total / 10)
-        entities = body.hits.hits
-      }
-    }, function (error) {
-      console.trace(error.message)
-    })
-    */
   }
 
   this.create = function (body) {
-    this.save([body])
-    // return client.post('/', serialize(body))
+    body['_id'] = Date.now()
+    list.push(body)
+
+    this.save(list)
   }
 
-  this.update = function (id, body) {
-    // return client.post('/' + id, serialize(body))
+  this.update = function (index, body) {
+    list[index]['title'] = body.title
+    list[index]['content'] = body.content
+
+    this.save(list)
   }
 
-  this.delete = function (id) {
-    // return client.delete('/' + id)
+  this.delete = function (index) {
+    list.splice(index, 1)
 
-    // return client.post('/delete?id=' + id)
+    this.save(list)
   }
 
   this.save = function (data) {

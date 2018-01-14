@@ -28,8 +28,8 @@
                 <div class="comment">Comment</div>
             </div>
             <div class="body">
-                <div class="body-row" v-for="note in notes">
-                    <form @change="updateNote(note)" @keydown="noteForm(note, $event)">
+                <div class="body-row" v-for="(note, index) in notes">
+                    <form @change="updateNote(index, note)" @keydown="noteForm(index, note, $event)">
                         <div class="title">
                             <div class="field-wrap form-group">
                                 <textarea v-model="note.title" style="min-height: 150px"></textarea>
@@ -145,36 +145,27 @@ let list = {
         this.addNote()
       }
     },
-    updateNote (note) {
+    updateNote (index, note) {
       let body = {
         title: note.title,
-        content: note.content,
-        createdAt: note.date,
-        updatedAd: note.date
+        content: note.content
       }
 
-      this.repository.save(this.notes)
-      this.repository.update(note._id, body)
+      this.repository.update(index, body)
     },
-    noteForm (note, ev) {
+    noteForm (index, note, ev) {
       if (ev.code === 'Delete' && (ev.shiftKey || ev.ctrlKey)) {
-        this.deleteNote(note)
+        this.deleteNote(index, note)
       }
       if (ev.code === 'Enter' && ev.ctrlKey) {
-        this.updateNote(note)
+        this.updateNote(index, note)
       }
     },
-    deleteNote (note) {
+    deleteNote (index, note) {
       if (confirm('Are you sure?')) {
-        this.repository.delete(note._id)
+        this.repository.delete(index)
 
-        for (let k in this.notes) {
-          console.log(k, this.notes[k])
-          if (this.notes[k]['_id'] === note._id) {
-            this.notes.splice(k, 1)
-            break
-          }
-        }
+        this.notes.splice(index, 1)
       }
     },
     loadMore () {
