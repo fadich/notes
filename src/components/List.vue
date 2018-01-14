@@ -90,8 +90,6 @@ Vue.component('textfield', {
   }
 })
 
-const HOST = 'http://localhost:8010/'
-
 let list = {
   name: 'List',
   data () {
@@ -186,9 +184,7 @@ let list = {
     }
   },
   mounted () {
-    this.repository = new Repository({
-      host: HOST
-    })
+    this.repository = new Repository()
 
     this.searchNotes()
   }

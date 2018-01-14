@@ -1,5 +1,10 @@
 import axios from 'axios'
 
+const IS_DEV = process.env.NODE_ENV === 'development'
+const APP_URL = encodeURI(IS_DEV ? 'http://localhost:8080/#/' : 'https://notes.royallib.pw')
+const BASE_URL = IS_DEV ? 'http://org.loc/' : 'https://www.org.royallib.pw/'
+const AUTH_URL = BASE_URL + 'auth/?land-to=' + APP_URL
+
 let Repository = function (parameters) {
   let list = []
 
@@ -9,7 +14,7 @@ let Repository = function (parameters) {
     }
 
     return {
-      host: params.host || null,
+      host: BASE_URL,
       perPage: 10
     }
   })(parameters)
@@ -20,26 +25,31 @@ let Repository = function (parameters) {
     withCredentials: true,
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Content-Type': 'application/json; charset=UTF-8',
       'X-Requested-With': 'XMLHttpRequest'
     }
   })
 
-  client.get('/get')
+  client.get('/storage')
     .then(function (res) {
       list = JSON.parse(res.data.data)
     })
-
-  let serialize = function (obj) {
-    let str = []
-    for (let p in obj) {
-      if (obj.hasOwnProperty(p)) {
-        str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]))
+    .catch(function (res) {
+      if (res.message === 'Request failed with status code 403') {
+        window.location.replace(AUTH_URL)
       }
-    }
+    })
 
-    return str.join('&')
-  }
+  // let serialize = function (obj) {
+  //   let str = []
+  //   for (let p in obj) {
+  //     if (obj.hasOwnProperty(p)) {
+  //       str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]))
+  //     }
+  //   }
+  //
+  //   return str.join('&')
+  // }
 
   this.search = function (query, page) {
     let res = {}
@@ -70,6 +80,7 @@ let Repository = function (parameters) {
   }
 
   this.create = function (body) {
+    this.save([body])
     // return client.post('/', serialize(body))
   }
 
@@ -84,7 +95,9 @@ let Repository = function (parameters) {
   }
 
   this.save = function (data) {
-    return client.post('/save', serialize({data: JSON.stringify(data)}))
+    return client.post('/storage', {
+      data: JSON.stringify(data)
+    })
   }
 }
 
