@@ -177,7 +177,12 @@ let list = {
   mounted () {
     this.repository = new Repository()
 
-    setTimeout(this.searchNotes, 1000)
+    let searchInt = setInterval(function () {
+      if (this.repository.isReady()) {
+        this.searchNotes()
+        clearInterval(searchInt)
+      }
+    }.bind(this), 100)
   }
 }
 
