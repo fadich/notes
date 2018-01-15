@@ -66,27 +66,38 @@ let Repository = function (parameters) {
 
       if (query.length) {
         let grams = this.getGrams(query)
+        console.log(grams)
         tempList = []
 
         for (let i in list) {
           let item = list[i]
-          let score = 0.0
-
+          // let score = 0.0
+          //
+          // for (let j in grams) {
+          //   let gram = grams[j]
+          //   let len = gram.length
+          //   let countT = item.title.split(gram).length - 1
+          //   let countC = item.content.split(gram).length - 1
+          //
+          //   score += countT * len
+          //   score += countC * len
+          // }
+          //
+          // if (score) {
+          //   item['_score'] = score
+          //   tempList.push(item)
+          // }
           for (let j in grams) {
             let gram = grams[j]
-            let len = gram.length
             let countT = item.title.split(gram).length - 1
             let countC = item.content.split(gram).length - 1
 
-            score += countT * len
-            score += countC * len
-          }
+            if (countT || countC) {
+              item['_score'] = gram.length
+              tempList.push(item)
 
-          score /= item.title.length + item.content.length
-
-          if (score) {
-            item['_score'] = score
-            tempList.push(item)
+              break
+            }
           }
         }
 
