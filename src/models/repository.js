@@ -82,6 +82,8 @@ let Repository = function (parameters) {
             score += countC * len
           }
 
+          score /= item.title.length + item.content.length
+
           if (score) {
             item['_score'] = score
             tempList.push(item)
