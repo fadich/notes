@@ -1,5 +1,5 @@
 (function () {
-  document.body.onkeydown = function (ev) {
+  let resize = function (ev) {
     if (ev.target.tagName.toLowerCase() !== 'textarea') {
       return
     }
@@ -11,4 +11,7 @@
       el.style.cssText = 'height:' + (el.scrollHeight + 3) + 'px'
     }, 0)
   }
+
+  document.body.onkeydown = resize
+  document.body.onclick = resize
 })()

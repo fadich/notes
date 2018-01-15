@@ -8,48 +8,7 @@ const AUTH_URL = BASE_URL + 'auth/?land-to=' + APP_URL
 let Repository = function (parameters) {
   let tempList = []
   let ready = false
-  let list = [
-    {
-      title: '1',
-      content: '1',
-      _id: 1
-    },
-    {
-      title: '2',
-      content: '2',
-      _id: 12
-    },
-    {
-      title: '3',
-      content: '3',
-      _id: 123
-    },
-    {
-      title: '4',
-      content: '4',
-      _id: 1234
-    },
-    {
-      title: '5',
-      content: '5',
-      _id: 12345
-    },
-    {
-      title: '6',
-      content: '6',
-      _id: 123456
-    },
-    {
-      title: '7',
-      content: '7',
-      _id: 1234567
-    },
-    {
-      title: '8',
-      content: '8',
-      _id: 12345678
-    }
-  ]
+  let list = []
 
   let config = (function (params) {
     if (!arguments) {
@@ -60,7 +19,7 @@ let Repository = function (parameters) {
       host: BASE_URL,
       minN: 2,
       maxN: 2,
-      perPage: 3
+      perPage: 10
     }
   })(parameters)
 
@@ -82,21 +41,21 @@ let Repository = function (parameters) {
   if (_list && Array.isArray(_list)) {
     list = _list
     ready = true
-  } else {
-    client.get('/storage')
-      .then(function (res) {
-        list = JSON.parse(res.data.data)
-        localStorage.setItem('_list', res.data.data)
-        ready = true
-
-        IS_DEV && console.log(list)
-      })
-      .catch(function (res) {
-        if (res.message === 'Request failed with status code 403') {
-          window.location.replace(AUTH_URL)
-        }
-      })
   }
+
+  client.get('/storage')
+    .then(function (res) {
+      list = JSON.parse(res.data.data)
+      localStorage.setItem('_list', res.data.data)
+      ready = true
+
+      IS_DEV && console.log(list)
+    })
+    .catch(function (res) {
+      if (res.message === 'Request failed with status code 403') {
+        window.location.replace(AUTH_URL)
+      }
+    })
 
   this.search = function (query, page) {
     let res = {}
