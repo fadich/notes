@@ -84,7 +84,6 @@ let Repository = function (parameters) {
               maxGram = gram.length
             }
             score += gram.length * (countT + countC)
-
           }
 
           if (score) {
