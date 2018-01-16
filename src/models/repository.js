@@ -73,17 +73,22 @@ let Repository = function (parameters) {
         for (let i in list) {
           let item = list[i]
           let score = 0.0
+          let maxGram = 0
 
           for (let j in grams) {
             let gram = grams[j]
             let countT = item.title.toLowerCase().split(gram).length - 1
             let countC = item.content.toLowerCase().split(gram).length - 1
 
+            if (maxGram < gram.length) {
+              maxGram = gram.length
+            }
             score += gram.length * (countT + countC)
+
           }
 
           if (score) {
-            item['_score'] = score - (item.title.length + item.content.length) * 0.001
+            item['_score'] = score - Math.abs(maxGram - (item.title.length + item.content.length)) * 0.01
             tempList.push(item)
           }
         }
