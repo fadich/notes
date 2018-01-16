@@ -17,8 +17,6 @@ let Repository = function (parameters) {
 
     return {
       host: BASE_URL,
-      minN: 2,
-      maxN: 2,
       perPage: 10
     }
   })(parameters)
@@ -61,43 +59,32 @@ let Repository = function (parameters) {
     let res = {}
     let start = (page - 1) * config.perPage
 
+    query = query.toLowerCase()
+
     if (page === 1) {
       tempList = list.slice(0, list.length)
 
       if (query.length) {
-        let grams = this.getGrams(query)
-        console.log(grams)
+        let grams = this.getGrams(query, query.length - 2, query.length)
+        IS_DEV && console.log(grams)
+
         tempList = []
 
         for (let i in list) {
           let item = list[i]
-          // let score = 0.0
-          //
-          // for (let j in grams) {
-          //   let gram = grams[j]
-          //   let len = gram.length
-          //   let countT = item.title.split(gram).length - 1
-          //   let countC = item.content.split(gram).length - 1
-          //
-          //   score += countT * len
-          //   score += countC * len
-          // }
-          //
-          // if (score) {
-          //   item['_score'] = score
-          //   tempList.push(item)
-          // }
+          let score = 0.0
+
           for (let j in grams) {
             let gram = grams[j]
-            let countT = item.title.split(gram).length - 1
-            let countC = item.content.split(gram).length - 1
+            let countT = item.title.toLowerCase().split(gram).length - 1
+            let countC = item.content.toLowerCase().split(gram).length - 1
 
-            if (countT || countC) {
-              item['_score'] = gram.length
-              tempList.push(item)
+            score += gram.length * (countT + countC)
+          }
 
-              break
-            }
+          if (score) {
+            item['_score'] = score - (item.title.length + item.content.length) * 0.001
+            tempList.push(item)
           }
         }
 
@@ -110,6 +97,18 @@ let Repository = function (parameters) {
               tempList[k] = temp
               k--
               continue
+            }
+            if (tempList[k]['_score'] === tempList[k - 1]['_score']) {
+              let len1 = tempList[k].title.length + tempList[k].content.length
+              let len2 = tempList[k - 1].title.length + tempList[k - 1].content.length
+
+              if (len1 < len2) {
+                let temp = tempList[k - 1]
+                tempList[k - 1] = tempList[k]
+                tempList[k] = temp
+                k--
+                continue
+              }
             }
             break
           }
@@ -163,18 +162,24 @@ let Repository = function (parameters) {
     return ready
   }
 
-  this.getGrams = function (word) {
-    let min = Math.min(config.minN, config.maxN)
-    let max = Math.max(config.minN, config.maxN)
+  this.getGrams = function (word, min, max) {
     let len = word.length
     let grams = []
+
+    min = min || 2
+    max = max || min
+    min = (min < 1) ? 1 : min
+    max = (max < 1) ? 1 : min
+
+    min = Math.min(min, max)
+    max = Math.max(min, max)
 
     min = (min > len) ? len : min
     max = (max > len) ? len : max
 
-    for (let cur = min; cur <= max; cur++) {
-      for (let start = 0; start <= len - cur; start++) {
-        grams.push(word.slice(start, cur))
+    for (let size = min; size <= max; size++) {
+      for (let cur = 0; cur <= len - size; cur++) {
+        grams.push(word.slice(cur, cur + size))
       }
     }
 
