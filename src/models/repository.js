@@ -87,7 +87,7 @@ let Repository = function (parameters) {
           }
 
           if (score) {
-            item['_score'] = score - Math.abs(maxGram - (item.title.length + item.content.length)) * 0.01
+            item['_score'] = score - Math.abs(maxGram - (item.title.length + item.content.length)) * 0.1
             tempList.push(item)
           }
         }
