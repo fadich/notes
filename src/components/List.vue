@@ -55,7 +55,7 @@
 
 <script>
 
-import '../helpers/textarea'
+import '../helpers/elementBehaviours'
 import Vue from 'vue'
 import Repository from '../models/repository'
 
