@@ -65,7 +65,9 @@ let Repository = function (parameters) {
       tempList = list.slice(0, list.length)
 
       if (query.length) {
-        let grams = this.getGrams(query, query.length - 2, query.length)
+        let min = query.length < 4 ? 2 : query.length - 2
+        let max = query.length
+        let grams = this.getGrams(query, min, max)
         IS_DEV && console.log(grams)
 
         tempList = []

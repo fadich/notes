@@ -16,12 +16,15 @@ new Vue({
     App
   },
   mounted () {
-    document.body.onkeydown = (ev) => {
+    let resize = (ev) => {
       if (ev.target.tagName.toLowerCase() !== 'textarea') {
         return
       }
 
       eb.resize(ev.target)
     }
+
+    document.body.onkeydown = resize
+    document.body.onclick = resize
   }
 })
