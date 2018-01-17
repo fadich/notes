@@ -28,8 +28,8 @@
                 <div class="comment">Comment</div>
             </div>
             <div class="body">
-                <div class="body-row" v-for="note in notes">
-                    <form @change="updateNote(note)" @keydown="noteForm(note, $event)">
+                <div class="body-row" v-for="(note, index) in notes">
+                    <form @change="updateNote(index, note)" @keydown="noteForm(index, note, $event)">
                         <div class="title">
                             <div class="field-wrap form-group">
                                 <textarea v-model="note.title" style="min-height: 150px"></textarea>
@@ -55,7 +55,7 @@
 
 <script>
 
-import '../helpers/textarea'
+import '../helpers/elementBehaviours'
 import Vue from 'vue'
 import Repository from '../models/repository'
 
@@ -90,8 +90,6 @@ Vue.component('textfield', {
   }
 })
 
-const HOST = 'http://localhost:8010/'
-
 let list = {
   name: 'List',
   data () {
@@ -113,21 +111,12 @@ let list = {
         this.page = 1
       }
 
-      let t = function (response) {
-        let data = response.data[0]
+      let data = this.repository.search(this.query, this.page)
 
-        if (data) {
-          this.notes = Array.concat(this.notes, data.items)
-          this.pages = data.pages
-        }
-        console.log(this.notes)
+      if (data) {
+        this.notes = Array.concat(this.notes, data.items)
+        this.pages = data.pages
       }
-
-      this.repository.search(this.query, this.page)
-        .then(t.bind(this))
-        .catch(function (error) {
-          console.log(error)
-        })
     },
     addNote (e) {
       if (e) {
@@ -156,35 +145,27 @@ let list = {
         this.addNote()
       }
     },
-    updateNote (note) {
+    updateNote (index, note) {
       let body = {
         title: note.title,
-        content: note.content,
-        createdAt: note.date,
-        updatedAd: note.date
+        content: note.content
       }
 
-      this.repository.update(note._id, body)
+      this.repository.update(index, body)
     },
-    noteForm (note, ev) {
+    noteForm (index, note, ev) {
       if (ev.code === 'Delete' && (ev.shiftKey || ev.ctrlKey)) {
-        this.deleteNote(note)
+        this.deleteNote(index)
       }
       if (ev.code === 'Enter' && ev.ctrlKey) {
-        this.updateNote(note)
+        this.updateNote(index, note)
       }
     },
-    deleteNote (note) {
+    deleteNote (index) {
       if (confirm('Are you sure?')) {
-        this.repository.delete(note._id)
+        this.repository.delete(index)
 
-        for (let k in this.notes) {
-          console.log(k, this.notes[k])
-          if (this.notes[k]['_id'] === note._id) {
-            this.notes.splice(k, 1)
-            break
-          }
-        }
+        this.notes.splice(index, 1)
       }
     },
     loadMore () {
@@ -194,11 +175,14 @@ let list = {
     }
   },
   mounted () {
-    this.repository = new Repository({
-      host: HOST
-    })
+    this.repository = new Repository()
 
-    this.searchNotes()
+    let searchInt = setInterval(function () {
+      if (this.repository.isReady()) {
+        this.searchNotes()
+        clearInterval(searchInt)
+      }
+    }.bind(this), 100)
   }
 }
 

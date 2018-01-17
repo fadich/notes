@@ -3,8 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-
-import './helpers/textarea'
+import eb from './helpers/elementBehaviours'
 
 Vue.config.productionTip = false
 
@@ -15,5 +14,14 @@ new Vue({
   template: '<App/>',
   components: {
     App
+  },
+  mounted () {
+    document.body.onkeydown = (ev) => {
+      if (ev.target.tagName.toLowerCase() !== 'textarea') {
+        return
+      }
+
+      eb.resize(ev.target)
+    }
   }
 })
