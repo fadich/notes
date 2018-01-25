@@ -8,6 +8,10 @@ function ElemBehaviours () {
     }, 0)
   }
 
+  this.isHidden = () => {
+    return !showForm
+  }
+
   this.showForm = (event) => {
     let el = event.target
     let form = this.getParentByTagName(el, 'form')
@@ -19,6 +23,7 @@ function ElemBehaviours () {
   this.hideForm = (event, delay) => {
     let el = event.target
     let form = this.getParentByTagName(el, 'form')
+    delay = delay === undefined ? 500 : delay
 
     showForm = false
 
@@ -35,7 +40,7 @@ function ElemBehaviours () {
         }
         form.classList.remove('collapse')
       }
-    }, delay || 500)
+    }, delay)
   }
 
   /**

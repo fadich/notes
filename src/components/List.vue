@@ -9,7 +9,10 @@
                    @keyup="searchNotes(true)">
         </div>
 
-        <form class="note-form" @submit="addNote" @keydown="addNoteInput">
+        <form class="note-form"
+              @submit="addNote"
+              @change="addNoteChange"
+              @keydown="addNoteInput">
             <div class="field-wrap form-group field-title hidden">
                 <textarea class="form-control input-padding"
                           placeholder="Note title"
@@ -42,18 +45,22 @@
                                       placeholder="Note title"
                                       v-model="note.title"
                                       @focus="eb.showForm($event)"
-                                      @focusout="eb.hideForm($event)"
                                       rows="1">
                             </textarea>
                         </div>
-                        <div class="field-wrap visible">
-                            <div class="textfield form-group">
-                                <textarea class="form-control input-padding"
-                                          placeholder="Note content"
-                                          v-model="note.content"
-                                          @focus="eb.showForm($event)"
-                                          @focusout="eb.hideForm($event)">
-                                </textarea>
+                        <div class="field-wrap textfield form-group visible">
+                            <textarea class="form-control input-padding"
+                                      placeholder="Note content"
+                                      v-model="note.content"
+                                      @focus="eb.showForm($event)">
+                            </textarea>
+                        </div>
+                        <div class="options hidden">
+                            <div class="left">
+                                <a href="#" @click="deleteNoteOption($event, index)">Delete</a>
+                            </div>
+                            <div class="right">
+                                <a href="#" @click="eb.hideForm($event, 0)">Hide</a>
                             </div>
                         </div>
                     </form>
@@ -101,6 +108,13 @@ let list = {
         this.pages = data.pages
       }
     },
+    addNoteChange () {
+      setTimeout(function () {
+        if (this.eb.isHidden()) {
+          this.addNote()
+        }
+      }.bind(this), 5)
+    },
     addNote (e) {
       if (e) {
         e.preventDefault()
@@ -134,7 +148,11 @@ let list = {
         content: note.content
       }
 
-      this.repository.update(index, body)
+      if (body.title || body.content) {
+        this.repository.update(index, body)
+      } else {
+        this.deleteNote(index, 0)
+      }
     },
     noteForm (index, note, ev) {
       if (ev.code === 'Delete' && (ev.shiftKey || ev.ctrlKey)) {
@@ -144,12 +162,20 @@ let list = {
         this.updateNote(index, note)
       }
     },
-    deleteNote (index) {
-      if (confirm('Are you sure?')) {
-        this.repository.delete(index)
-
-        this.notes.splice(index, 1)
+    deleteNote (index, conf) {
+      conf = arguments.length < 2 ? 1 : conf
+      if (conf) {
+        if (!confirm('Delete the note?')) {
+          return
+        }
       }
+
+      this.repository.delete(index)
+      this.notes.splice(index, 1)
+    },
+    deleteNoteOption (ev, index) {
+      eb.hideForm(ev, 0)
+      this.deleteNote(index)
     },
     loadMore () {
       this.loading = true
@@ -184,6 +210,7 @@ export default list
             flex-direction: column;
             width: 100%;
             justify-content: center;
+            padding-bottom: 20px;
 
             textarea {
                 /*border: 0;*/
@@ -238,7 +265,23 @@ export default list
             &.collapse {
                 transition: 0.5s;
                 .hidden {
-                    display: block !important;
+                    display: block;
+                }
+
+                .options {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 5px 15px;
+
+                    a {
+                        color: #808080;
+
+                        &:hover {
+                            transition: 300ms;
+                            text-decoration: none;
+                            color: #506070;
+                        }
+                    }
                 }
             }
         }

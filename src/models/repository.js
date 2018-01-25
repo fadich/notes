@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const IS_DEV = process.env.NODE_ENV === 'development'
-const APP_URL = encodeURI(IS_DEV ? 'http://localhost:8080/#/' : 'https://notes.royallib.pw')
+const APP_URL = encodeURI(IS_DEV ? 'http://localhost:8081/#/' : 'https://notes.royallib.pw')
 // const BASE_URL = IS_DEV ? 'http://org.loc/' : 'https://www.auth.royallib.pw/'
 const BASE_URL = IS_DEV ? 'https://www.auth.royallib.pw/' : 'https://www.auth.royallib.pw/'
 const AUTH_URL = BASE_URL + 'auth/?land-to=' + APP_URL
@@ -33,19 +33,19 @@ let Repository = function (parameters) {
     }
   })
 
-  let _list = localStorage.getItem('_list')
-
-  _list = JSON.parse(_list)
-
-  if (_list && Array.isArray(_list)) {
-    list = _list
-    ready = true
-  }
+  // let _list = localStorage.getItem('_list')
+  //
+  // _list = JSON.parse(_list)
+  //
+  // if (_list && Array.isArray(_list)) {
+  //   list = _list
+  //   ready = true
+  // }
 
   client.get('/storage')
     .then(function (res) {
       list = JSON.parse(res.data.data)
-      localStorage.setItem('_list', res.data.data)
+      // localStorage.setItem('_list', res.data.data)
       ready = true
 
       IS_DEV && console.log(list)
@@ -158,7 +158,7 @@ let Repository = function (parameters) {
   this.save = function () {
     let _list = JSON.stringify(list)
 
-    localStorage.setItem('_list', _list)
+    // localStorage.setItem('_list', _list)
 
     return client.post('/storage', {
       data: _list
