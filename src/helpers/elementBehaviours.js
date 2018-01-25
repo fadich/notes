@@ -24,6 +24,7 @@ function ElemBehaviours () {
     let el = event.target
     let form = this.getParentByTagName(el, 'form')
     delay = delay === undefined ? 500 : delay
+    event.preventDefault()
 
     showForm = false
 
