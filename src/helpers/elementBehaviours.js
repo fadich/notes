@@ -5,7 +5,7 @@ function ElemBehaviours () {
     setTimeout(function () {
       element.style.cssText = 'height:auto;'
       element.style.cssText = 'height:' + (element.scrollHeight + 3) + 'px'
-    }, 0)
+    }, 10)
   }
 
   this.isHidden = () => {
@@ -23,7 +23,7 @@ function ElemBehaviours () {
   this.hideForm = (event, delay) => {
     let el = event.target
     let form = this.getParentByTagName(el, 'form')
-    delay = delay === undefined ? 500 : delay
+    delay = delay === undefined ? 50 : delay
     event.preventDefault()
 
     showForm = false

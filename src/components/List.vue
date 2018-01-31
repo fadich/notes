@@ -39,8 +39,8 @@
         <div class="table">
             <div class="body">
                 <div class="body-row" v-for="(note, index) in notes">
-                    <form class="note-form" @change="updateNote(index, note)" @keydown="noteForm(index, note, $event)">
-                        <div class="field-wrap form-group field-title" :class="note.title ? '' : 'hidden'">
+                    <form class="note-form bordered" @change="updateNote(index, note)" @keydown="noteForm(index, note, $event)">
+                        <div class="field-wrap form-group field-title m-content" :class="note.title ? '' : 'hidden'">
                             <textarea class="form-control input-padding"
                                       placeholder="Note title"
                                       v-model="note.title"
@@ -48,14 +48,14 @@
                                       rows="1">
                             </textarea>
                         </div>
-                        <div class="field-wrap textfield form-group visible">
+                        <div class="field-wrap textfield form-group visible m-content">
                             <textarea class="form-control input-padding"
                                       placeholder="Note content"
                                       v-model="note.content"
                                       @focus="eb.showForm($event)">
                             </textarea>
                         </div>
-                        <div class="options hidden">
+                        <div class="options hidden m-content">
                             <div class="left">
                                 <a href="#" @click="deleteNoteOption($event, index)">Delete</a>
                             </div>
@@ -63,6 +63,7 @@
                                 <a href="#" @click="eb.hideForm($event, 0)">Hide</a>
                             </div>
                         </div>
+                        <div class="hidden overlay"></div>
                     </form>
                 </div>
             </div>
@@ -210,7 +211,7 @@ export default list
             flex-direction: column;
             width: 100%;
             justify-content: center;
-            padding-bottom: 20px;
+            margin-bottom: 20px;
 
             textarea {
                 /*border: 0;*/
@@ -223,7 +224,8 @@ export default list
                     outline: none;
                     transition: 0.5s;
                     box-shadow: none;
-                    border: solid 1px #0a3d82 !important;
+                    border-top: solid 1px #0a3d82 !important;
+                    border-bottom: solid 1px #0a3d82 !important;
                 }
             }
 
@@ -264,6 +266,11 @@ export default list
 
             &.collapse {
                 transition: 0.5s;
+
+                &.bordered {
+                    border: 1px solid #888888;
+                }
+
                 .hidden {
                     display: block;
                 }
@@ -272,6 +279,7 @@ export default list
                     display: flex;
                     justify-content: space-between;
                     padding: 5px 15px;
+                    background: white;
 
                     a {
                         color: #808080;
@@ -283,6 +291,19 @@ export default list
                         }
                     }
                 }
+
+                .m-content {
+                    z-index: 5;
+                }
+            }
+
+            .overlay {
+                background: rgba(0, 0, 0, 0.25);
+                height: 100vh;
+                width: 100vw;
+                position: fixed;
+                top: 0;
+                left: 0;
             }
         }
 
